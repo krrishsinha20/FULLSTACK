@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Low Light Image Enhancer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Syne', sans-serif;
+      min-height: 100vh;
+      background: #0d0d0f;
+      color: #f0eefc;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 860px;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1px;
+      color: #f0eefc;
+    }
+
+    .header h1 span {
+      color: #7F77DD;
+    }
+
+    .header p {
+      font-size: 13px;
+      color: #888;
+      margin-top: 6px;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-family: 'Space Mono', monospace;
+      background: #EEEDFE22;
+      color: #7F77DD;
+      border: 1px solid #534AB755;
+      border-radius: 4px;
+      padding: 2px 8px;
+      margin-left: 10px;
+      vertical-align: middle;
+    }
+
+    .upload-zone {
+      border: 1.5px dashed #333;
+      border-radius: 16px;
+      background: #131316;
+      padding: 2.5rem 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+      margin-bottom: 1.5rem;
+    }
+
+    .upload-zone:hover, .upload-zone.drag {
+      border-color: #7F77DD;
+      background: #1a1a2e;
+    }
+
+    .upload-icon {
+      width: 52px; height: 52px;
+      margin: 0 auto 1rem;
+      border-radius: 50%;
+      background: #1e1b38;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .upload-icon svg { width: 24px; height: 24px; stroke: #7F77DD; }
+
+    .upload-zone p { font-size: 15px; color: #ccc; }
+    .upload-zone small {
+      font-size: 12px;
+      color: #555;
+      font-family: 'Space Mono', monospace;
+      display: block;
+      margin-top: 4px;
+    }
+
+    .canvas-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    @media (max-width: 600px) {
+      .canvas-row { grid-template-columns: 1fr; }
+    }
+
+    .canvas-box {
+      background: #131316;
+      border: 0.5px solid #222;
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    .canvas-label {
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      padding: 9px 14px;
+      border-bottom: 0.5px solid #222;
+      color: #666;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .canvas-label.enhanced { color: #7F77DD; }
+
+    canvas {
+      width: 100%;
+      display: block;
+      max-height: 300px;
+      object-fit: contain;
+      background: #0a0a0c;
+    }
+
+    .empty-state {
+      height: 220px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #333;
+      font-size: 12px;
+      font-family: 'Space Mono', monospace;
+      background: #0a0a0c;
+    }
+
+    .controls {
+      background: #131316;
+      border: 0.5px solid #222;
+      border-radius: 14px;
+      padding: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .controls-title {
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      color: #444;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 1.2rem;
+    }
+
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .control-row:last-child { margin-bottom: 0; }
+
+    .ctrl-label {
+      font-size: 12px;
+      font-family: 'Space Mono', monospace;
+      color: #888;
+      min-width: 95px;
+    }
+
+    .ctrl-val {
+      font-size: 12px;
+      font-family: 'Space Mono', monospace;
+      font-weight: 700;
+      color: #f0eefc;
+      min-width: 36px;
+      text-align: right;
+    }
+
+    input[type=range] {
+      flex: 1;
+      -webkit-appearance: none;
+      height: 4px;
+      background: #222;
+      border-radius: 2px;
+      outline: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px; height: 16px;
+      border-radius: 50%;
+      background: #7F77DD;
+      cursor: pointer;
+      border: 2px solid #131316;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 12px 0;
+      border-radius: 10px;
+      border: 0.5px solid #333;
+      font-family: 'Syne', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #1a1a1e;
+      color: #ccc;
+      transition: opacity 0.15s, background 0.15s;
+    }
+
+    .btn:hover { background: #222; }
+
+    .btn.primary {
+      background: #534AB7;
+      color: #fff;
+      border-color: #534AB7;
+    }
+
+    .btn.primary:hover { background: #7F77DD; }
+
+    .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+    .preset-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .preset-btn {
+      font-size: 11px;
+      font-family: 'Space Mono', monospace;
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid #333;
+      background: #131316;
+      color: #888;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .preset-btn:hover { border-color: #7F77DD; color: #7F77DD; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="header">
+      <h1>✦ Low Light Enhancer <span class="badge">CANVAS</span></h1>
+      <p>apni dark photo upload karo — chamka dete hain</p>
+    </div>
+
+    <div class="upload-zone" id="dropzone">
+      <div class="upload-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="17 8 12 3 7 8"/>
+          <line x1="12" y1="3" x2="12" y2="15"/>
+        </svg>
+      </div>
+      <p>Photo drag karo ya click karo upload ke liye</p>
+      <small>JPG, PNG, WEBP · sab supported hai</small>
+      <input type="file" id="fileInput" accept="image/*" style="display:none">
+    </div>
+
+    <div class="preset-row">
+      <button class="preset-btn" onclick="applyPreset('night')">🌙 Night Shot</button>
+      <button class="preset-btn" onclick="applyPreset('indoor')">💡 Indoor Dim</button>
+      <button class="preset-btn" onclick="applyPreset('golden')">🌅 Golden Hour</button>
+      <button class="preset-btn" onclick="applyPreset('vivid')">✨ Vivid</button>
+      <button class="preset-btn" onclick="applyPreset('natural')">🌿 Natural</button>
+    </div>
+
+    <div class="canvas-row">
+      <div class="canvas-box">
+        <div class="canvas-label">⬛ original</div>
+        <canvas id="origCanvas" style="display:none"></canvas>
+        <div class="empty-state" id="origEmpty">koi photo nahi</div>
+      </div>
+      <div class="canvas-box">
+        <div class="canvas-label enhanced">◈ enhanced</div>
+        <canvas id="outCanvas" style="display:none"></canvas>
+        <div class="empty-state" id="outEmpty">yahan dikhega</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="controls-title">⚙ adjustments</div>
+      <div class="control-row">
+        <span class="ctrl-label">☀ brightness</span>
+        <input type="range" id="brightness" min="-50" max="150" value="60" step="1">
+        <span class="ctrl-val" id="bv">+60</span>
+      </div>
+      <div class="control-row">
+        <span class="ctrl-label">◑ contrast</span>
+        <input type="range" id="contrast" min="-100" max="100" value="30" step="1">
+        <span class="ctrl-val" id="cv">+30</span>
+      </div>
+      <div class="control-row">
+        <span class="ctrl-label">✦ saturation</span>
+        <input type="range" id="saturation" min="-100" max="100" value="20" step="1">
+        <span class="ctrl-val" id="sv">+20</span>
+      </div>
+      <div class="control-row">
+        <span class="ctrl-label">⊛ sharpen</span>
+        <input type="range" id="sharpen" min="0" max="10" value="4" step="1">
+        <span class="ctrl-val" id="shv">4</span>
+      </div>
+      <div class="control-row">
+        <span class="ctrl-label">◐ gamma</span>
+        <input type="range" id="gamma" min="50" max="250" value="140" step="1">
+        <span class="ctrl-val" id="gv">1.40</span>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn" id="resetBtn" disabled onclick="resetAll()">↺ reset</button>
+      <button class="btn primary" id="enhanceBtn" disabled onclick="applyEnhancement()">⚡ enhance karo</button>
+      <button class="btn" id="downloadBtn" disabled onclick="downloadImg()">↓ download</button>
+    </div>
+  </div>
+
+  <script>
+    let origImg = null;
+
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('fileInput');
+    const origCanvas = document.getElementById('origCanvas');
+    const outCanvas = document.getElementById('outCanvas');
+    const origCtx = origCanvas.getContext('2d');
+    const outCtx = outCanvas.getContext('2d');
+
+    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('drag'); });
+    dropzone.addEventListener('dragleave', () => dropzone.classList.remove('drag'));
+    dropzone.addEventListener('drop', e => {
+      e.preventDefault();
+      dropzone.classList.remove('drag');
+      handleFile(e.dataTransfer.files[0]);
+    });
+    fileInput.addEventListener('change', e => handleFile(e.target.files[0]));
+
+    function handleFile(file) {
+      if (!file || !file.type.startsWith('image/')) return;
+      const url = URL.createObjectURL(file);
+      origImg = new Image();
+      origImg.onload = () => {
+        const MAX = 700;
+        let w = origImg.width, h = origImg.height;
+        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX; }
+        if (h > MAX) { w = Math.round(w * MAX / h); h = MAX; }
+
+        origCanvas.width = outCanvas.width = w;
+        origCanvas.height = outCanvas.height = h;
+        origCtx.drawImage(origImg, 0, 0, w, h);
+
+        origCanvas.style.display = 'block';
+        document.getElementById('origEmpty').style.display = 'none';
+
+        document.getElementById('enhanceBtn').disabled = false;
+        document.getElementById('resetBtn').disabled = false;
+
+        applyEnhancement();
+      };
+      origImg.src = url;
+    }
+
+    function getVal(id) { return parseInt(document.getElementById(id).value); }
+
+    function applyEnhancement() {
+      if (!origImg) return;
+      const w = origCanvas.width, h = origCanvas.height;
+      outCtx.drawImage(origCanvas, 0, 0, w, h);
+
+      let imgData = outCtx.getImageData(0, 0, w, h);
+      let data = imgData.data;
+
+      const bright = getVal('brightness');
+      const cont = getVal('contrast');
+      const sat = getVal('saturation');
+      const gamma = getVal('gamma') / 100;
+      const sharpenStr = getVal('sharpen');
+
+      const factor = (259 * (cont + 255)) / (255 * (259 - cont));
+
+      for (let i = 0; i < data.length; i += 4) {
+        let r = data[i], g = data[i+1], b = data[i+2];
+
+        // Gamma correction
+        r = Math.pow(r / 255, 1 / gamma) * 255;
+        g = Math.pow(g / 255, 1 / gamma) * 255;
+        b = Math.pow(b / 255, 1 / gamma) * 255;
+
+        // Brightness + Contrast
+        r = factor * (r - 128) + 128 + bright;
+        g = factor * (g - 128) + 128 + bright;
+        b = factor * (b - 128) + 128 + bright;
+
+        // Saturation
+        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+        const sf = 1 + sat / 100;
+        r = gray + sf * (r - gray);
+        g = gray + sf * (g - gray);
+        b = gray + sf * (b - gray);
+
+        data[i]   = Math.max(0, Math.min(255, r));
+        data[i+1] = Math.max(0, Math.min(255, g));
+        data[i+2] = Math.max(0, Math.min(255, b));
+      }
+
+      outCtx.putImageData(imgData, 0, 0);
+
+      if (sharpenStr > 0) applySharpen(outCtx, w, h, sharpenStr / 5);
+
+      outCanvas.style.display = 'block';
+      document.getElementById('outEmpty').style.display = 'none';
+      document.getElementById('downloadBtn').disabled = false;
+    }
+
+    function applySharpen(ctx, w, h, amount) {
+      const imgData = ctx.getImageData(0, 0, w, h);
+      const d = imgData.data;
+      const out = new Uint8ClampedArray(d);
+      const k = amount;
+      for (let y = 1; y < h - 1; y++) {
+        for (let x = 1; x < w - 1; x++) {
+          const i = (y * w + x) * 4;
+          for (let c = 0; c < 3; c++) {
+            const center = d[i + c];
+            const top    = d[((y-1)*w + x)*4 + c];
+            const bot    = d[((y+1)*w + x)*4 + c];
+            const left   = d[(y*w + x-1)*4 + c];
+            const right  = d[(y*w + x+1)*4 + c];
+            out[i + c] = Math.max(0, Math.min(255, center + k * (4 * center - top - bot - left - right)));
+          }
+        }
+      }
+      imgData.data.set(out);
+      ctx.putImageData(imgData, 0, 0);
+    }
+
+    const presets = {
+      night:   { brightness: 80, contrast: 40, saturation: 10, sharpen: 5, gamma: 160 },
+      indoor:  { brightness: 50, contrast: 25, saturation: 15, sharpen: 3, gamma: 130 },
+      golden:  { brightness: 40, contrast: 30, saturation: 50, sharpen: 2, gamma: 120 },
+      vivid:   { brightness: 30, contrast: 60, saturation: 80, sharpen: 6, gamma: 110 },
+      natural: { brightness: 30, contrast: 15, saturation: 5,  sharpen: 2, gamma: 115 },
+    };
+
+    function applyPreset(name) {
+      const p = presets[name];
+      document.getElementById('brightness').value = p.brightness;
+      document.getElementById('contrast').value = p.contrast;
+      document.getElementById('saturation').value = p.saturation;
+      document.getElementById('sharpen').value = p.sharpen;
+      document.getElementById('gamma').value = p.gamma;
+      updateLabels();
+      if (origImg) applyEnhancement();
+    }
+
+    function updateLabels() {
+      const b = getVal('brightness'), c = getVal('contrast'), s = getVal('saturation');
+      document.getElementById('bv').textContent = b > 0 ? '+' + b : b;
+      document.getElementById('cv').textContent = c > 0 ? '+' + c : c;
+      document.getElementById('sv').textContent = s > 0 ? '+' + s : s;
+      document.getElementById('shv').textContent = getVal('sharpen');
+      document.getElementById('gv').textContent = (getVal('gamma') / 100).toFixed(2);
+    }
+
+    ['brightness','contrast','saturation','sharpen','gamma'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
+        updateLabels();
+        if (origImg) applyEnhancement();
+      });
+    });
+
+    function resetAll() {
+      applyPreset('night');
+      document.getElementById('brightness').value = 60;
+      document.getElementById('contrast').value = 30;
+      document.getElementById('saturation').value = 20;
+      document.getElementById('sharpen').value = 4;
+      document.getElementById('gamma').value = 140;
+      updateLabels();
+      if (origImg) applyEnhancement();
+    }
+
+    function downloadImg() {
+      const a = document.createElement('a');
+      a.href = outCanvas.toDataURL('image/png');
+      a.download = 'enhanced_photo.png';
+      a.click();
+    }
+  </script>
+</body>
+</html>
