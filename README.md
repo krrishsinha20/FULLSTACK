@@ -1,34 +1,34 @@
-# 🌙 GAN-Based Low-Light Image Enhancement System
+# GAN-Based Low-Light Image Enhancement System
 
-A full-stack web application that enhances low-light images using a **Generative Adversarial Network (GAN)** to improve brightness, contrast, and overall visibility.
-
----
-
-## 🚀 Overview
-
-Low-light conditions often degrade image quality, making it difficult for computer vision systems to perform accurately. This project provides a **deep learning-based solution** integrated into a full-stack application that allows users to upload images and receive enhanced outputs in real time.
+A full-stack web application that enhances low-light images using a Generative Adversarial Network (GAN) to improve brightness, contrast, and overall visibility.
 
 ---
 
-## 🧠 Key Features
+## Overview
 
-* 📤 Image Upload Interface
-* 🤖 GAN-based Image Enhancement
-* ⚡ Real-time Processing
-* 🖼️ Side-by-side Comparison (Before vs After)
-* ☁️ Cloud Storage Integration
-* 📥 Download Enhanced Images
-* 🔗 API-based Architecture
+Low-light conditions degrade image quality, making it difficult for computer vision systems to perform accurately. This project provides a deep learning-based solution integrated into a full-stack application that allows users to upload images and receive enhanced outputs in real time.
 
 ---
 
-## 🏗️ System Architecture
+## Key Features
+
+* Image upload interface
+* GAN-based image enhancement
+* Real-time processing
+* Side-by-side comparison (before vs after)
+* Cloud storage integration
+* Download enhanced images
+* API-based architecture
+
+---
+
+## System Architecture
 
 User Upload → React Frontend → FastAPI Backend → GAN Model → Storage → Database → Response
 
 ---
 
-## 🛠️ Tech Stack
+## Technology Stack
 
 ### Frontend
 
@@ -43,9 +43,9 @@ User Upload → React Frontend → FastAPI Backend → GAN Model → Storage →
 ### Deep Learning
 
 * PyTorch
-* GAN (Generator + Discriminator)
+* Generative Adversarial Network (GAN)
 
-### Database & Storage
+### Database and Storage
 
 * PostgreSQL
 * Supabase Storage
@@ -53,40 +53,40 @@ User Upload → React Frontend → FastAPI Backend → GAN Model → Storage →
 ### Deployment
 
 * Netlify (Frontend)
-* Hugging Face Spaces (Model + Backend)
+* Hugging Face Spaces (Model and Backend)
 
 ---
 
-## ⚙️ How It Works
+## Working of the System
 
-1. User uploads a low-light image via the frontend
-2. Image is sent to backend through REST API
-3. GAN model processes the image
-4. Enhanced image is generated
-5. Output is stored and returned to user
-
----
-
-## 📡 API Endpoints
-
-| Endpoint    | Method | Description             |
-| ----------- | ------ | ----------------------- |
-| `/upload`   | POST   | Upload image            |
-| `/enhance`  | POST   | Enhance image using GAN |
-| `/retrieve` | GET    | Fetch stored images     |
+1. The user uploads a low-light image through the frontend interface.
+2. The image is sent to the backend using REST API.
+3. The GAN model processes the image and enhances it.
+4. The enhanced image is generated and stored.
+5. The processed image is returned and displayed to the user.
 
 ---
 
-## 📊 Evaluation Metrics
+## API Endpoints
 
-* **PSNR (Peak Signal-to-Noise Ratio)**
-* **SSIM (Structural Similarity Index)**
-
-These metrics validate improvement in image quality.
+| Endpoint  | Method | Description             |
+| --------- | ------ | ----------------------- |
+| /upload   | POST   | Upload image            |
+| /enhance  | POST   | Enhance image using GAN |
+| /retrieve | GET    | Fetch stored images     |
 
 ---
 
-## 🧪 Testing
+## Evaluation Metrics
+
+* PSNR (Peak Signal-to-Noise Ratio)
+* SSIM (Structural Similarity Index)
+
+These metrics are used to evaluate improvement in image quality.
+
+---
+
+## Testing
 
 * Functional Testing
 * API Testing
@@ -94,16 +94,13 @@ These metrics validate improvement in image quality.
 
 ---
 
-## 📷 Sample Output
+## Sample Output
 
-*(Add your images here)*
-
-* Before Enhancement
-* After Enhancement
+(Add sample images here: before and after enhancement)
 
 ---
 
-## 📦 Installation
+## Installation
 
 ### Clone Repository
 
@@ -128,33 +125,33 @@ npm start
 
 ---
 
-## 🌐 Deployment
+## Deployment
 
-* Frontend: Netlify
-* Backend + Model: Hugging Face Spaces
-* Database: Supabase
-
----
-
-## 📈 Future Enhancements
-
-* 🎥 Video enhancement support
-* ⚡ Real-time streaming
-* 📱 Mobile application
-* 🔍 Integration with object detection
+* Frontend hosted on Netlify
+* Backend and model deployed on Hugging Face Spaces
+* Database managed using Supabase
 
 ---
 
-## 📚 References
+## Future Enhancements
 
-* Goodfellow et al., *Generative Adversarial Networks*, 2014
+* Video enhancement
+* Real-time processing
+* Mobile application
+* Integration with object detection systems
+
+---
+
+## References
+
+* Goodfellow et al., Generative Adversarial Networks, 2014
 * EnlightenGAN, IEEE TIP 2021
 * Retinex-Net, CVPR 2019
 * LLNet, Pattern Recognition 2017
 
 ---
 
-## 👨‍💻 Contributors
+## Contributors
 
 * Khurinji Malar
 * Krrish Sinha
@@ -163,10 +160,6 @@ npm start
 
 ---
 
-## 🔗 GitHub Repository
+## GitHub Repository
 
-(Add your repo link here)
-
----
-
-## ⭐ If you like this project, give it a star!
+(Add your repository link here)
